@@ -2,8 +2,8 @@
 <html lang="ur" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Urdu Assignment App - Custom Sizing</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Urdu Assignment App - Mobile Fix</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,6 +13,7 @@
     <style>
         :root {
             --primary: #2563eb;
+            --primary-dark: #1e40af;
             --secondary: #475569;
             --bg-body: #f1f5f9;
             --sidebar-bg: #ffffff;
@@ -21,7 +22,7 @@
             --border-color: #cbd5e1;
             --urdu-font: 'Noto Nastaliq Urdu', serif;
             
-            /* Default Base Variables */
+            /* Base Variables */
             --base-font-size: 18px;
             --base-line-height: 2.2;
         }
@@ -69,15 +70,26 @@
             align-items: center;
             justify-content: space-between;
             background: #f8fafc;
+            flex-shrink: 0;
         }
         .sidebar-title { font-size: 1.1rem; font-weight: bold; color: var(--primary); }
+        
+        /* Desktop Download Button in Header */
+        .btn-download-desktop {
+            background: #dc2626; color: white; border: none;
+            padding: 8px 15px; border-radius: 6px; font-family: var(--urdu-font);
+            font-weight: bold; font-size: 0.9rem; cursor: pointer;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .btn-download-desktop:hover { background: #b91c1c; }
+
         .close-sidebar-btn { display: none; cursor: pointer; padding: 5px; border: none; background: none; }
 
         .sidebar-content {
             flex: 1;
             overflow-y: auto;
             padding: 15px;
-            padding-bottom: 80px;
+            padding-bottom: 20px;
         }
 
         /* --- CONTROLS --- */
@@ -122,46 +134,26 @@
             font-size: 0.9rem;
             white-space: nowrap;
         }
-        .btn-mini:hover { background: #bae6fd; }
 
         .slider-box { background: #f8fafc; padding: 10px; border-radius: 6px; margin-bottom: 10px; border: 1px solid var(--border-color); }
         .slider-header { display: flex; justify-content: space-between; font-family: sans-serif; font-size: 0.8rem; margin-bottom: 5px; }
         input[type=range] { width: 100%; cursor: pointer; }
 
-        /* --- EDITOR & TOOLBAR --- */
+        /* --- EDITOR --- */
         .editor-box { border: 2px solid var(--primary); border-radius: 8px; overflow: hidden; background: #fff; }
-        
-        /* The Toolbar */
-        .toolbar { 
-            background: #eff6ff; 
-            padding: 6px; 
-            display: flex; 
-            gap: 5px; 
-            border-bottom: 1px solid var(--border-color);
-            flex-wrap: wrap;
-        }
-
+        .toolbar { background: #eff6ff; padding: 6px; display: flex; gap: 5px; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; }
         .tool-btn {
             height: 32px; border: 1px solid #bfdbfe; background: white; border-radius: 4px;
             cursor: pointer; font-weight: bold; color: var(--primary);
-            display: flex; align-items: center; justify-content: center;
-            min-width: 32px;
+            display: flex; align-items: center; justify-content: center; min-width: 32px;
         }
         .tool-btn:hover { background: #dbeafe; }
         
-        /* Size buttons specific style */
-        .tool-btn.size-btn {
-            width: 40px; font-family: sans-serif; font-size: 1.2rem;
-        }
-
         #mainEditor {
             min-height: 200px; padding: 15px; overflow-y: auto;
             font-family: var(--urdu-font); 
-            font-size: var(--base-font-size); /* Uses Base size initially */
-            font-weight: 700;
-            line-height: var(--base-line-height); 
-            direction: rtl; 
-            text-align: justify;
+            font-size: var(--base-font-size); font-weight: 700;
+            line-height: var(--base-line-height); direction: rtl; text-align: justify;
             outline: none; cursor: text;
         }
 
@@ -175,29 +167,26 @@
             padding: 40px;
             overflow-y: auto;
             position: relative;
+            transition: padding 0.3s;
         }
 
+        /* Backdrop for Mobile Sidebar */
+        .backdrop {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 20; opacity: 0; transition: opacity 0.3s;
+        }
+        .backdrop.show { display: block; opacity: 1; }
+
+        /* Sidebar Toggle Button (Desktop) */
         .toggle-sidebar {
             position: absolute; right: 340px; top: 20px;
             background: white; border: 1px solid var(--border-color);
             padding: 10px; border-radius: 50%; cursor: pointer;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            z-index: 20; transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10; transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; align-items: center; justify-content: center;
         }
         .toggle-sidebar svg { width: 20px; height: 20px; fill: var(--text-main); }
-
-        .fab-download {
-            position: absolute; left: 20px; bottom: 20px;
-            background: #dc2626; color: white;
-            width: 60px; height: 60px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
-            cursor: pointer; border: none; z-index: 25;
-            transition: transform 0.2s;
-        }
-        .fab-download:hover { transform: scale(1.1); background: #b91c1c; }
-        .fab-download svg { width: 32px; height: 32px; fill: white; }
 
         /* Paper */
         .paper {
@@ -227,22 +216,27 @@
         /* --- MOBILE NAV --- */
         .mobile-nav {
             display: none; position: fixed; bottom: 0; left: 0; width: 100%;
-            background: white; border-top: 1px solid var(--border-color); height: 60px;
+            background: white; border-top: 1px solid var(--border-color); height: 65px;
             z-index: 100; box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
             justify-content: space-around; align-items: center;
         }
         .nav-item {
             flex: 1; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
             background: none; border: none; cursor: pointer; font-family: var(--urdu-font); font-weight: bold;
+            color: var(--secondary);
         }
-        .nav-item svg { width: 24px; height: 24px; margin-bottom: 4px; fill: #64748b; }
-        .nav-item.active svg { fill: var(--primary); }
+        .nav-item svg { width: 24px; height: 24px; margin-bottom: 4px; fill: var(--secondary); }
+        .nav-item.active svg { fill: var(--primary); color: var(--primary); }
+        
+        /* Mobile Download Button Styling in Nav */
+        .nav-btn-pdf { color: #dc2626; }
+        .nav-btn-pdf svg { fill: #dc2626; }
 
         /* --- PRINT STYLES --- */
         @media print {
             @page { margin: 0; size: A4; }
             body { background: white; height: auto; display: block; }
-            .sidebar, .mobile-nav, .toggle-sidebar, .toolbar, .slider-box, .fab-download { display: none !important; }
+            .sidebar, .mobile-nav, .toggle-sidebar, .toolbar, .slider-box, .backdrop { display: none !important; }
             .app-container { display: block; }
             .main-area { padding: 0; overflow: visible; background: white; }
             .paper { box-shadow: none; margin: 0; width: 100%; padding: 15mm; }
@@ -251,50 +245,70 @@
             input { display: none; }
         }
 
-        /* --- RESPONSIVE --- */
+        /* --- RESPONSIVE BREAKPOINTS --- */
         @media (max-width: 768px) {
             .app-container { flex-direction: column; }
+            
+            /* Sidebar becomes full screen overlay */
             .sidebar {
                 width: 100%; position: fixed; top: 0; right: 0; height: 100%;
                 transform: translateX(100%);
             }
             .sidebar.show { transform: translateX(0); }
             .close-sidebar-btn { display: block; }
-            .main-area { width: 100%; padding: 15px; }
+            .btn-download-desktop { display: none; } /* Hide desktop button in mobile header */
+            
+            /* Main Area takes full width */
+            .main-area { width: 100%; padding: 15px; align-items: center; }
+            
+            /* Paper becomes responsive */
             .paper { width: 100%; padding: 15px; min-height: auto; }
-            .toggle-sidebar { display: none; }
-            .mobile-nav { display: flex; }
             .paper-meta { flex-direction: column; }
             .meta-dash { min-width: 50px; }
-            .fab-download { width: 50px; height: 50px; left: 10px; bottom: 70px; }
+            
+            /* Toggle button logic */
+            .toggle-sidebar { display: none; }
+            
+            /* Mobile Nav Shows */
+            .mobile-nav { display: flex; }
+            
+            /* Inputs font size fix for mobile */
+            input[type="text"] { font-size: 1rem; }
         }
     </style>
 </head>
 <body>
 
     <div class="app-container">
+        <!-- Backdrop for mobile dim effect -->
+        <div class="backdrop" id="backdrop" onclick="toggleMobile('preview')"></div>
+
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <span class="sidebar-title">اردو اسائنمنٹ</span>
+                <!-- Desktop Download Button -->
+                <button class="btn-download-desktop" onclick="printPDF()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                    PDF
+                </button>
+                <!-- Mobile Close Button -->
                 <button class="close-sidebar-btn" onclick="toggleMobile('preview')">
                     <svg width="24" height="24" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
                 </button>
             </div>
 
             <div class="sidebar-content">
-                <!-- Base Settings (Global) -->
-                <span class="section-label">بنیادی ترتیبات (Base)</span>
+                <span class="section-label">سیٹنگز</span>
                 <div class="slider-box">
-                    <div class="slider-header"><span>پہلے سے سائز (Default)</span> <span id="sizeVal">18px</span></div>
+                    <div class="slider-header"><span>پہلے سے سائز</span> <span id="sizeVal">18px</span></div>
                     <input type="range" id="sizeRange" min="14" max="28" value="18" oninput="updateBaseSettings()">
                 </div>
                 <div class="slider-box">
-                    <div class="slider-header"><span>لائن فاصلہ (Spacing)</span> <span id="lineVal">2.2</span></div>
+                    <div class="slider-header"><span>لائن فاصلہ</span> <span id="lineVal">2.2</span></div>
                     <input type="range" id="lineRange" min="1.5" max="3.0" step="0.1" value="2.2" oninput="updateBaseSettings()">
                 </div>
 
-                <!-- Fields -->
                 <span class="section-label">معلومات</span>
                 <div class="input-group"><input type="text" id="inSchool" placeholder="اسکول کا نام" oninput="sync()"></div>
                 <div class="input-group"><input type="text" id="inName" placeholder="طالب علم کا نام" oninput="sync()"></div>
@@ -307,21 +321,17 @@
                 </div>
                 <div class="input-group"><input type="text" id="inTitle" placeholder="عنوان" oninput="sync()"></div>
 
-                <!-- Editor -->
                 <span class="section-label">اسائنمنٹ لکھیں</span>
                 <div class="editor-box">
-                    <!-- Toolbar with New Size Buttons -->
                     <div class="toolbar">
                         <button class="tool-btn" onclick="exec('bold')">B</button>
                         <button class="tool-btn" onclick="exec('italic')">I</button>
                         <button class="tool-btn" onclick="exec('underline')">U</button>
-                        <div style="width:1px; background:#ccc; margin:0 5px;"></div>
                         <button class="tool-btn" onclick="exec('justifyLeft')">R</button>
                         <button class="tool-btn" onclick="exec('justifyFull')">J</button>
                         <div style="width:1px; background:#ccc; margin:0 5px;"></div>
-                        <!-- The New Plus/Minus Buttons -->
-                        <button class="tool-btn size-btn" onclick="changeSize('decrease')" title="کم کریں">-</button>
-                        <button class="tool-btn size-btn" onclick="changeSize('increase')" title="بڑھائیں">+</button>
+                        <button class="tool-btn" onclick="changeSize('decrease')">-</button>
+                        <button class="tool-btn" onclick="changeSize('increase')">+</button>
                     </div>
                     <div id="mainEditor" contenteditable="true" spellcheck="false" oninput="sync()"></div>
                 </div>
@@ -346,10 +356,6 @@
                 <div class="paper-title" id="outTitle">عنوان</div>
                 <div id="outBody">متن یہاں...</div>
             </div>
-
-            <button class="fab-download" onclick="printPDF()" title="Download PDF">
-                <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-            </button>
         </main>
     </div>
 
@@ -363,7 +369,8 @@
             <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5z"/></svg>
             دیکھیں
         </button>
-        <button class="nav-item" onclick="printPDF()">
+        <!-- Mobile PDF Button -->
+        <button class="nav-item nav-btn-pdf" onclick="printPDF()">
             <svg viewBox="0 0 24 24"><path d="M19 8h-1V3H6v5H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3z"/></svg>
             PDF
         </button>
@@ -395,30 +402,19 @@
             const l = document.getElementById('lineRange').value;
             document.getElementById('sizeVal').innerText = s + 'px';
             document.getElementById('lineVal').innerText = l;
-            
-            // Update CSS Variables for Base Size (affects whole editor container initially)
             document.documentElement.style.setProperty('--base-font-size', s + 'px');
             document.documentElement.style.setProperty('--base-line-height', l);
             save();
         }
 
-        // --- FORMATTING LOGIC ---
-
         function exec(cmd) { document.execCommand(cmd); sync(); }
 
-        // Custom Size Function for Lines/Selection
         function changeSize(action) {
-            // We use document.execCommand with relative sizing because it handles
-            // complex nested HTML (Bold+Italic) better than manual span wrapping.
-            // 'increaseFontSize' wraps in <big>, 'decreaseFontSize' wraps in <small>
-            
             if (action === 'increase') {
                 document.execCommand('increaseFontSize', false, null);
             } else if (action === 'decrease') {
                 document.execCommand('decreaseFontSize', false, null);
             }
-            
-            // The selection might change cursor position, so we focus back
             document.getElementById('mainEditor').focus();
             sync();
         }
@@ -431,7 +427,8 @@
             sync();
         }
 
-        // --- UI LOGIC ---
+        // --- UI Logic ---
+
         function toggleSidebarDesktop() {
             const sb = document.getElementById('sidebar');
             const btn = document.querySelector('.toggle-sidebar');
@@ -452,16 +449,21 @@
 
         function toggleMobile(mode) {
             const sb = document.getElementById('sidebar');
+            const bd = document.getElementById('backdrop');
             const edit = document.getElementById('mobEdit');
             const prev = document.getElementById('mobPrev');
             
             if (mode === 'edit') {
                 sb.style.display = 'flex';
+                // Trigger reflow
+                void sb.offsetWidth;
                 sb.style.transform = 'translateX(0)';
+                bd.classList.add('show');
                 edit.classList.add('active');
                 prev.classList.remove('active');
             } else {
                 sb.style.transform = 'translateX(100%)';
+                bd.classList.remove('show');
                 setTimeout(() => { sb.style.display = 'none'; }, 300);
                 edit.classList.remove('active');
                 prev.classList.add('active');
@@ -479,11 +481,11 @@
             data['body'] = document.getElementById('mainEditor').innerHTML;
             data['size'] = document.getElementById('sizeRange').value;
             data['line'] = document.getElementById('lineRange').value;
-            localStorage.setItem('urduFinal_v4', JSON.stringify(data));
+            localStorage.setItem('urduFinal_v5', JSON.stringify(data));
         }
 
         function load() {
-            const d = JSON.parse(localStorage.getItem('urduFinal_v4'));
+            const d = JSON.parse(localStorage.getItem('urduFinal_v5'));
             if (d) {
                 fields.forEach(f => { if(d[f.in]) document.getElementById(f.in).value = d[f.in]; });
                 if(d['body']) document.getElementById('mainEditor').innerHTML = d['body'];
