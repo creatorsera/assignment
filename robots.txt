@@ -1,3 +1,0 @@
-User-agent: *
-Allow: /
-Sitemap: https://assignment-six-sable.vercel.app/sitemap.xml
